@@ -8,7 +8,7 @@ import ProfileDropdown from './proDrop';
 function Header() {
   return (
     <div className='md:h-[8vh] w-full'>
-      <Disclosure as="nav" className="bg-green-400">
+      <Disclosure as="nav" className="h-full w-full bg-slate-900">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <NavigationBar />

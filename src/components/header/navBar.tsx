@@ -1,20 +1,21 @@
+import { Link } from 'react-router-dom';
 import { classNames, navigation } from '../../dummyData/header/dummyData';
 function NavigationBar() {
   return (
-    <div className="flex items-center">
+    <div className="flex items-center w-9/10 justify-center">
       <div className="shrink-0">
         <img
           alt="Your Company"
-          src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-          className="size-8"
+          src="./dummy-logo.png"
+          className="size-12"
         />
       </div>
       <div className="hidden md:block">
         <div className="ml-10 flex items-baseline space-x-4">
           {navigation.map((item) => (
-            <a
+            <Link
               key={item.name}
-              href={item.href}
+              to={item.href}
               aria-current={item.current ? 'page' : undefined}
               className={classNames(
                 item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
@@ -22,7 +23,7 @@ function NavigationBar() {
               )}
             >
               {item.name}
-            </a>
+            </Link>
           ))}
         </div>
       </div>
