@@ -1,5 +1,5 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
-import { user, userNavigation } from "../../dummyData/header/dummyData";
+import { user, userNavigation } from "../../../dummyData/header/dummyData";
 
 function ProfileDropdown() {
   return (

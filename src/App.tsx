@@ -1,11 +1,11 @@
 import { Route, Routes } from "react-router-dom";
 
-import Body from './components/body/main';
-import Footer from './components/footer/main';
-import Header from './components/header/main';
+import Body from './components/main/body/layout';
+import Footer from './components/main/footer/layout';
+import Header from './components/main/header/layout';
 
 import AboutUs from './components/pages/aboutus';
-import Dashboard from './components/pages/dashboard';
+import Home from './components/pages/home';
 
 export default function App() {
   return (
@@ -13,7 +13,7 @@ export default function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Body />}>
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route index element={<Home />} />
           <Route path="aboutus" element={<AboutUs />} />
         </Route>
       </Routes>

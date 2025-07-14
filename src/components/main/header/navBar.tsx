@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { classNames, navigation } from '../../dummyData/header/dummyData';
+import { classNames, navigation } from '../../../dummyData/header/dummyData';
 function NavigationBar() {
   return (
     <div className="flex items-center w-9/10 justify-center">

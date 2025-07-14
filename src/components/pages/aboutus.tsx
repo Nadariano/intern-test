@@ -1,6 +1,9 @@
+
 function AboutUs() {
   return (
-    <div>This is about us</div>
+    <div>
+      This is the About Us page.
+    </div>
   )
 }
 

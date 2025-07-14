@@ -1,5 +1,5 @@
 import { DisclosureButton, DisclosurePanel } from "@headlessui/react";
-import { classNames, navigation, user, userNavigation } from "../../dummyData/header/dummyData";
+import { classNames, navigation, user, userNavigation } from "../../../dummyData/header/dummyData";
 import { BellIcon } from "@heroicons/react/24/outline";
 
 function MobileMenu() {
