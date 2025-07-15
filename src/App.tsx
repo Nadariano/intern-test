@@ -6,10 +6,12 @@ import Header from './components/main/header/layout';
 
 import AboutUs from './components/pages/aboutus';
 import Home from './components/pages/home';
+import { ToastContainer } from "react-toastify";
 
 export default function App() {
   return (
     <div className="max-h-full flex flex-col">
+      <ToastContainer />
       <Header />
       <Routes>
         <Route path="/" element={<Body />}>

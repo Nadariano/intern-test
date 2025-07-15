@@ -1,83 +1,35 @@
-import { useEffect, useState } from "react";
-import { getAllCourses } from "../../apis/courses";
-import Skeleton from "react-loading-skeleton";
+import { useState } from "react";
 import "react-loading-skeleton/dist/skeleton.css";
-import { formatMoney } from "../../utils/format";
+import AllCourses from "../custom/allCourse";
+import HotCourses from "../custom/hotCourses";
 import SearchBar from "../custom/searchBar";
+import PriceRange from "../custom/priceRange";
 
 function Home() {
   const [courses, setCourses] = useState<Map<number, Course>>(new Map());
   const [loading, setLoading] = useState(true);
-
-  const fetchCourses = async () => {
-    try {
-      const response = await getAllCourses();
-      const courseMap = new Map<number, Course>();
-      response.forEach((course: Course) => {
-        courseMap.set(course.id, course);
-      });
-      setCourses(courseMap);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-    } finally {
-      setLoading(false);
-    }
-  }
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchCourses();
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [])
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   return (
     <div>
-      <header className="flex flex-col items-center justify-center bg-white shadow-sm">
+      <header className="flex flex-col items-center justify-center">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 text-center">Welcome to Course Dealers</h1>
         </div>
-        <SearchBar setCourses={setCourses} setLoading={setLoading} />
+        <HotCourses />
       </header>
       <div className="mx-auto w-full px-4 py-6 sm:px-6 lg:px-8">
+        <SearchBar setCourses={setCourses} setLoading={setLoading}
+          setPage={setPage} limit={limit} loading={loading}
+          searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <PriceRange courses={courses} setCourses={setCourses} setLoading={setLoading} setPage={setPage} />
         <div className="flex flex-wrap w-full justify-center">
-          {loading ?
-            <>
-              <div className="lg:w-[25vw] lg:h-[40vh] md:w-[45vw] md:h-[40vh] m-5 mb-4 border p-4 bg-white shadow text-center hover:shadow-lg items-center justify-center
-                md:mx-2 md:my-4">
-                <span><Skeleton count={3} width="100%" /></span>
-                <h2 className="text-xl font-semibold"><Skeleton height="15vh" width="10vw" /></h2>
-                <span><Skeleton count={5} width="100%" /></span>
-              </div>
-              <div className="lg:w-[25vw] lg:h-[40vh] md:w-[45vw] md:h-[40vh] m-5 mb-4 border p-4 bg-white shadow text-center hover:shadow-lg items-center justify-center
-                md:mx-2 md:my-4">
-                <span><Skeleton count={3} width="100%" /></span>
-                <h2 className="text-xl font-semibold"><Skeleton height="15vh" width="10vw" /></h2>
-                <span><Skeleton count={5} width="100%" /></span>
-              </div>
-              <div className="lg:w-[25vw] lg:h-[40vh] md:w-[45vw] md:h-[40vh] m-5 mb-4 border p-4 bg-white shadow text-center hover:shadow-lg items-center justify-center
-                md:mx-2 md:my-4">
-                <span><Skeleton count={3} width="100%" /></span>
-                <h2 className="text-xl font-semibold"><Skeleton height="15vh" width="10vw" /></h2>
-                <span><Skeleton count={5} width="100%" /></span>
-              </div>
-            </>
-            :
-            <>
-              {courses.values().map(course => (
-                <div key={course.id} className="flex flex-col lg:w-[25vw] lg:h-[40vh] md:w-[45vw] md:h-[40vh] m-5 mb-4 border p-4 bg-white shadow 
-                text-center hover:shadow-lg items-center justify-center
-                md:mx-2 md:my-4 overflow-y-scroll">
-                  <h2 className="text-xl font-semibold">{course.name}</h2>
-                  <p>{course.description}</p>
-                  <img src={course.image} alt={course.name} className="w-[80%] h-[40%]" />
-                  <p>Teacher: {course.author}</p>
-                  <p>Duration: {course.length} slots</p>
-                  <p>Price: {formatMoney(course.price)}</p>
-                </div>
-              ))}
-            </>
-          }
+          <AllCourses courses={courses} loading={loading} setCourses={setCourses} setLoading={setLoading}
+            page={page} setPage={setPage} limit={limit} setLimit={setLimit} totalPages={totalPages} setTotalPages={setTotalPages}
+            searchQuery={searchQuery} />
         </div>
       </div>
     </div>

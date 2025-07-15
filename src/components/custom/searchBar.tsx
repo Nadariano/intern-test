@@ -1,27 +1,32 @@
-import { useCallback, useEffect, useState } from "react";
-import { searchCourses } from "../../apis/courses";
+import { useCallback, useEffect } from "react";
+import { getPaginatedCoursesAndSort } from "../../apis/courses";
 
 interface SearchBarProps {
-  setCourses?: (courses: Map<number, Course>) => void;
-  setLoading?: (loading: boolean) => void;
+  setCourses: (courses: Map<number, Course>) => void;
+  loading: boolean;
+  setLoading: (loading: boolean) => void;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  limit: number;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
-function SearchBar({ setCourses, setLoading }: SearchBarProps) {
-  const [searchQuery, setSearchQuery] = useState<string>("");
+const SearchBar = ({ setCourses, setLoading, setPage, limit, searchQuery, setSearchQuery }: SearchBarProps) => {
 
   const searchByQuery = useCallback(async (query: string) => {
     try {
-      setLoading?.(true);
-      const results = await searchCourses('name', query);
+      setLoading(true);
+      setPage(1); // Reset to page 1 on new search
+      const results = await getPaginatedCoursesAndSort(1, limit, 'name', query);
       const courseMap = new Map<number, Course>();
       results.forEach((course: Course) => {
         courseMap.set(course.id, course);
       });
-      setCourses?.(courseMap);
+      setCourses(courseMap);
     } catch (error) {
       console.error("Error searching courses:", error);
     } finally {
-      setLoading?.(false);
+      setLoading(false);
     }
   }, [setCourses, setLoading]);
 
