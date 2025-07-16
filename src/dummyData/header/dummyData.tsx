@@ -6,7 +6,7 @@ const user = {
 }
 const navigation = [
   { name: 'Home', href: '/', current: true },
-  { name: 'Aboutus', href: '/aboutus', current: false },
+  { name: 'About Us', href: '/aboutus', current: false },
 ]
 const userNavigation = [
   { name: 'Your Profile', href: '#' },

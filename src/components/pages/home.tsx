@@ -8,11 +8,12 @@ import PriceRange from "../custom/priceRange";
 function Home() {
   const [courses, setCourses] = useState<Map<number, Course>>(new Map());
   const [loading, setLoading] = useState(true);
+  const [filtering, setFiltering] = useState(false);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState<string>("");
-
+  const [favCourseIds, setFavCourseIds] = useState<Map<number, number>>(new Map());
   return (
     <div>
       <header className="flex flex-col items-center justify-center">
@@ -25,9 +26,11 @@ function Home() {
         <SearchBar setCourses={setCourses} setLoading={setLoading}
           setPage={setPage} limit={limit} loading={loading}
           searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        <PriceRange courses={courses} setCourses={setCourses} setLoading={setLoading} setPage={setPage} />
+        <PriceRange limit={limit} searchQuery={searchQuery} setFiltering={setFiltering}
+        setCourses={setCourses} setLoading={setLoading} setPage={setPage} />
         <div className="flex flex-wrap w-full justify-center">
-          <AllCourses courses={courses} loading={loading} setCourses={setCourses} setLoading={setLoading}
+          <AllCourses courses={courses} loading={loading} filtering={filtering} setCourses={setCourses} 
+            favCourseIds={favCourseIds} setFavCourseIds={setFavCourseIds} setLoading={setLoading}
             page={page} setPage={setPage} limit={limit} setLimit={setLimit} totalPages={totalPages} setTotalPages={setTotalPages}
             searchQuery={searchQuery} />
         </div>

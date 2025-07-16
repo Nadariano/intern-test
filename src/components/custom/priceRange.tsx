@@ -1,19 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import { getCoursesByName, getPaginatedCoursesAndSort } from '../../apis/courses';
 import { formatMoney } from '../../utils/format';
 
 interface PriceRangeProps {
-  courses: Map<number, Course>;
+  searchQuery: string;
+  limit: number;
   setCourses: (courses: Map<number, Course>) => void;
   setLoading: (loading: boolean) => void;
+  setFiltering: (filtering: boolean) => void;
   setPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const PriceRange: React.FC<PriceRangeProps> = ({
-  courses,
+  searchQuery,
+  setFiltering,
   setCourses,
   setLoading,
   setPage,
 }) => {
+  const [tempCourses, setTempCourses] = useState<Map<number, Course>>(new Map());
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(5000000);
   const minRangeRef = useRef<HTMLInputElement>(null);
@@ -50,34 +56,64 @@ const PriceRange: React.FC<PriceRangeProps> = ({
     }
   };
 
-  const filterByPrice = async () => {
+  const searchByQuery = async (query: string): Promise<Map<number, Course>> => {
     try {
-      setPage(1);
-      setLoading(true);
-      const newCourses = Array.from(courses.values()).filter((course) => {
+      const results = await getCoursesByName(query);
+      const courseMap = new Map<number, Course>();
+      results.forEach((course: Course) => {
+        courseMap.set(course.id, course);
+      });
+      setTempCourses(courseMap); // optional if you still want to keep this state
+      return courseMap;
+    } catch (error) {
+      console.error("Error searching courses:", error);
+      return new Map(); // Return empty map on error
+    }
+  };
+
+  const filterByPrice = async () => {
+    setLoading(true);
+    const searchedCourses = await searchByQuery(searchQuery);
+    if (searchedCourses.size > 0) {
+      const filteredCourses = Array.from(searchedCourses.values()).filter((course) => {
         return course.price >= minValue && course.price <= maxValue;
       });
-      if (newCourses.length > 0) {
+
+      if (filteredCourses.length > 0) {
         const courseMap = new Map<number, Course>();
-        newCourses.forEach((course) => {
+        filteredCourses.forEach((course) => {
           courseMap.set(course.id, course);
         });
         setCourses(courseMap);
-        setLoading(false);
+      } else {
+        toast.error("No courses found in this price range.", {
+          position: "top-center",
+        });
+        setCourses(searchedCourses);
       }
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-    } finally {
-      setLoading(false);
     }
-  }
+    setFiltering(true);
+    setPage(1);
+    setLoading(false);
+  };
+
+
+  const resetFilter = async () => {
+    if (minValue === min && maxValue === max) return;
+    minRangeRef.current!.value = min.toString();
+    maxRangeRef.current!.value = max.toString();
+    setMinValue(min);
+    setMaxValue(max);
+    setFiltering(false);
+  };
+
   useEffect(() => {
     handleRangeUpdate();
   }, []);
 
   return (
     <div className="flex flex-1 justify-center items-center">
-      <div className="lg:w-[10vw] md:[40vw] bg-white p-6 rounded-lg shadow-lg">
+      <div className="lg:w-[30vw] md:[40vw] bg-white p-6 rounded-lg shadow-lg">
         <h2 className="text-lg font-bold">PRICE RANGE</h2>
 
         <div className="relative mt-4 h-[18px]">
@@ -113,12 +149,20 @@ const PriceRange: React.FC<PriceRangeProps> = ({
           <span>Min: {formatMoney(minValue)}</span>
           <span>Max: {formatMoney(maxValue)}</span>
           <button
-            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-blue-600 transition-colors"
             onClick={() => {
               filterByPrice();
             }}
           >
             Filter
+          </button>
+          <button
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            onClick={() => {
+              resetFilter();
+            }}
+          >
+            Reset
           </button>
         </div>
       </div>

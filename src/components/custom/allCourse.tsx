@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { getPaginatedCoursesAndSort } from "../../apis/courses";
+import { countAllCourses, getFavoriteCourses, getPaginatedCoursesAndSort } from "../../apis/courses";
 import CourseCard from "./courseCard";
 import CourseLoadingSkeleton from "./courseLoadingSkeleton";
 import Pagination from "./pagination";
@@ -7,7 +7,10 @@ import Pagination from "./pagination";
 interface AllCoursesProps {
   courses: Map<number, Course>;
   setCourses: (courses: Map<number, Course>) => void;
+  favCourseIds: Map<number, number>;
+  setFavCourseIds: (favCourses: Map<number, number>) => void;
   loading: boolean;
+  filtering: boolean;
   setLoading: (loading: boolean) => void;
   page: number;
   setPage: React.Dispatch<React.SetStateAction<number>>;
@@ -17,7 +20,7 @@ interface AllCoursesProps {
   setTotalPages: React.Dispatch<React.SetStateAction<number>>;
   searchQuery: string;
 }
-function AllCourses({ courses, setCourses, loading, setLoading, page, setPage, limit, setLimit, totalPages, setTotalPages, searchQuery }: AllCoursesProps) {
+const AllCourses = ({ courses, setCourses, favCourseIds, setFavCourseIds, loading, filtering, setLoading, page, setPage, limit, setLimit, totalPages, setTotalPages, searchQuery }: AllCoursesProps) => {
   const fetchCourses = async () => {
     try {
       const response = await getPaginatedCoursesAndSort(page, limit, 'name', searchQuery);
@@ -35,10 +38,38 @@ function AllCourses({ courses, setCourses, loading, setLoading, page, setPage, l
       setLoading(false);
     }
   }
+  const fetchFavCourses = async () => {
+    try {
+      const response = await getFavoriteCourses();
+      const favCourseMap = new Map<number, number>();
+      console.log(response);
+      response.forEach((course: any) => {
+        favCourseMap.set(Number(course.courseId), Number(course.courseId));
+      });
+      if (favCourseMap.size > 0) {
+        setFavCourseIds(favCourseMap);
+        console.log('Hello: ', favCourseMap.has(1));
+      }
+    } catch (error) {
+      console.error("Error fetching favorite courses:", error);
+    }
+  }
+  const fetchTotalPages = async () => {
+    try {
+      const totalCourses = await countAllCourses(limit);
+      setTotalPages(totalCourses);
+    } catch (error) {
+      console.error("Error fetching total pages:", error);
+    }
+  }
   useEffect(() => {
     setLoading(true);
-    fetchCourses();
-  }, [page, limit]);
+    if (!filtering) {
+      fetchCourses();
+      fetchTotalPages();
+    }
+    fetchFavCourses();
+  }, [, page, limit]);
   return (
     <>
       {(loading || !courses) ?
@@ -70,7 +101,11 @@ function AllCourses({ courses, setCourses, loading, setLoading, page, setPage, l
 
             <div className="flex flex-wrap justify-center">
               {courses.values().map((course) => (
-                <CourseCard key={course.id} course={course} />
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  isFavorite={favCourseIds.has(Number(course.id))}
+                />
               ))}
             </div>
 
@@ -79,6 +114,7 @@ function AllCourses({ courses, setCourses, loading, setLoading, page, setPage, l
               setPage={setPage}
               limit={limit}
               courses={courses}
+              totalPages={totalPages}
             />
           </div>
         </>

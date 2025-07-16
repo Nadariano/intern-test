@@ -11,12 +11,18 @@ interface SearchBarProps {
   setSearchQuery: (query: string) => void;
 }
 
-const SearchBar = ({ setCourses, setLoading, setPage, limit, searchQuery, setSearchQuery }: SearchBarProps) => {
+const SearchBar: React.FC<SearchBarProps> = ({
+  setCourses,
+  setLoading,
+  setPage,
+  limit,
+  searchQuery,
+  setSearchQuery }) => {
 
   const searchByQuery = useCallback(async (query: string) => {
     try {
       setLoading(true);
-      setPage(1); // Reset to page 1 on new search
+      setPage(1);
       const results = await getPaginatedCoursesAndSort(1, limit, 'name', query);
       const courseMap = new Map<number, Course>();
       results.forEach((course: Course) => {
