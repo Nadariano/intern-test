@@ -10,6 +10,7 @@ interface PriceRangeProps {
   setLoading: (loading: boolean) => void;
   setFiltering: (filtering: boolean) => void;
   setPage: React.Dispatch<React.SetStateAction<number>>;
+  setTotalPages: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const PriceRange: React.FC<PriceRangeProps> = ({
@@ -18,8 +19,8 @@ const PriceRange: React.FC<PriceRangeProps> = ({
   setCourses,
   setLoading,
   setPage,
+  setTotalPages,
 }) => {
-  const [tempCourses, setTempCourses] = useState<Map<number, Course>>(new Map());
   const [minValue, setMinValue] = useState(0);
   const [maxValue, setMaxValue] = useState(5000000);
   const minRangeRef = useRef<HTMLInputElement>(null);
@@ -63,7 +64,6 @@ const PriceRange: React.FC<PriceRangeProps> = ({
       results.forEach((course: Course) => {
         courseMap.set(course.id, course);
       });
-      setTempCourses(courseMap); // optional if you still want to keep this state
       return courseMap;
     } catch (error) {
       console.error("Error searching courses:", error);
@@ -85,11 +85,11 @@ const PriceRange: React.FC<PriceRangeProps> = ({
           courseMap.set(course.id, course);
         });
         setCourses(courseMap);
+        setTotalPages(1);
       } else {
         toast.error("No courses found in this price range.", {
           position: "top-center",
         });
-        setCourses(searchedCourses);
       }
     }
     setFiltering(true);
@@ -109,7 +109,7 @@ const PriceRange: React.FC<PriceRangeProps> = ({
 
   useEffect(() => {
     handleRangeUpdate();
-  }, []);
+  }, [minValue, maxValue]);
 
   return (
     <div className="flex flex-1 justify-center items-center">

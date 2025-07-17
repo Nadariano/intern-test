@@ -4,6 +4,7 @@ import AllCourses from "../custom/allCourse";
 import HotCourses from "../custom/hotCourses";
 import SearchBar from "../custom/searchBar";
 import PriceRange from "../custom/priceRange";
+import FavoritePanel from "../custom/favCoursePanel";
 
 function Home() {
   const [courses, setCourses] = useState<Map<number, Course>>(new Map());
@@ -27,13 +28,14 @@ function Home() {
           setPage={setPage} limit={limit} loading={loading}
           searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <PriceRange limit={limit} searchQuery={searchQuery} setFiltering={setFiltering}
-        setCourses={setCourses} setLoading={setLoading} setPage={setPage} />
+        setCourses={setCourses} setLoading={setLoading} setPage={setPage} setTotalPages={setTotalPages} />
         <div className="flex flex-wrap w-full justify-center">
           <AllCourses courses={courses} loading={loading} filtering={filtering} setCourses={setCourses} 
             favCourseIds={favCourseIds} setFavCourseIds={setFavCourseIds} setLoading={setLoading}
             page={page} setPage={setPage} limit={limit} setLimit={setLimit} totalPages={totalPages} setTotalPages={setTotalPages}
             searchQuery={searchQuery} />
         </div>
+        <FavoritePanel favCourseIds={favCourseIds} courses={courses} setFavCourseIds={setFavCourseIds} />
       </div>
     </div>
   )

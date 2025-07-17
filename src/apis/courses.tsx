@@ -73,13 +73,29 @@ export const getFavoriteCourses = async () => {
     return response.data;
 }
 
-export const checkFavoriteCourse = async (courseId: number) => {
-    const url = new URL('https://6537443cbb226bb85dd30234.mockapi.io/my_favorites');
-    url.searchParams.append('courseId', courseId.toString());
-    const response = await axios.get(url.toString());
+export const getFavCourseByCourseId = async (courseId: number) => {
+  try {
+    const response = await axios.get(
+      `https://6537443cbb226bb85dd30234.mockapi.io/my_favorites?courseId=${courseId}`
+    );
 
-    if (response.status === 200) {
-        return true;
-    }
-    else return false;
-}
+    return Array.isArray(response.data) ? response.data : [];
+  } catch (error: any) {
+    console.error("Error fetching favorite course:", error.response?.data || error.message);
+    return []; // fail safely
+  }
+};
+
+
+export const updateFavoriteCourse = async (courseId: number) => {
+  const favorites = await getFavCourseByCourseId(courseId);
+
+  if (favorites.length > 0) {
+    const favId = favorites[0].id; // assume 1 favorite per course
+    await axios.delete(`https://6537443cbb226bb85dd30234.mockapi.io/my_favorites/${favId}`);
+    toast.info('Removed from favorites');
+  } else {
+    await axios.post(`https://6537443cbb226bb85dd30234.mockapi.io/my_favorites`, { courseId });
+    toast.success('Added to favorites');
+  }
+};

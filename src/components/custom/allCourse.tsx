@@ -30,7 +30,6 @@ const AllCourses = ({ courses, setCourses, favCourseIds, setFavCourseIds, loadin
       });
       if (courseMap.size > 0) {
         setCourses(courseMap);
-        setLoading(false);
       }
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -63,13 +62,13 @@ const AllCourses = ({ courses, setCourses, favCourseIds, setFavCourseIds, loadin
     }
   }
   useEffect(() => {
-    setLoading(true);
     if (!filtering) {
+      setLoading(true);
       fetchCourses();
       fetchTotalPages();
     }
     fetchFavCourses();
-  }, [, page, limit]);
+  }, [filtering, page, limit]);
   return (
     <>
       {(loading || !courses) ?
@@ -105,6 +104,7 @@ const AllCourses = ({ courses, setCourses, favCourseIds, setFavCourseIds, loadin
                   key={course.id}
                   course={course}
                   isFavorite={favCourseIds.has(Number(course.id))}
+                  fetchFavCourses={fetchFavCourses}
                 />
               ))}
             </div>
